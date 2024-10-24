@@ -1,4 +1,6 @@
 import os
+import random
+import xml.etree.ElementTree as ET
 from collections import deque
 
 import pygame
@@ -17,6 +19,14 @@ def invoke(elementq: deque) -> tuple[int, int]:
     return quas, wex
 
 
+def fill_questq(questq: deque, questq_min_len: int, quest_list: list[ET.Element]):
+    while len(questq) < questq_min_len:
+        quest = random.choice(quest_list)
+
+        for spell in quest:
+            questq.append((int(spell[0].text), int(spell[1].text)))
+
+
 def main():
     pygame.init()
     length = 1280
@@ -26,6 +36,13 @@ def main():
     clock = pygame.time.Clock()
     running = True
     dt = 0
+
+    # Load the quest list and fill the quest queue.
+    questq = deque()
+    questq_min_len = 5
+    root = ET.parse("quest_list.xml").getroot()
+    quest_list = [q for q in root]
+    fill_questq(questq, questq_min_len, quest_list)
 
     quas = pygame.image.load(os.path.join("assets", "quas.png"))
     wex = pygame.image.load(os.path.join("assets", "wex.png"))
@@ -78,6 +95,18 @@ def main():
 
                         if len(spellq) == 0 or spellq[-1] != spell:
                             spellq.append(spell)
+                elif event.key == pygame.K_d:
+                    if len(spellq) > 0:
+                        used_spell = spellq[-1]
+                        if used_spell == questq[0]:
+                            questq.popleft()
+                            fill_questq(questq, questq_min_len, quest_list)
+                elif event.key == pygame.K_f:
+                    if len(spellq) > 1:
+                        used_spell = spellq[0]
+                        if used_spell == questq[0]:
+                            questq.popleft()
+                            fill_questq(questq, questq_min_len, quest_list)
 
         screen.fill("black")
 
@@ -103,6 +132,14 @@ def main():
 
         screen.blit(spell_slot0, slot0_rect)
         screen.blit(spell_slot1, slot1_rect)
+
+        i = -2
+        for j, k in questq:
+            position = (length / 2 + i * 128 - 64, width - 128)
+            i += 1
+
+            spell_image = spell_tensor[j][k]
+            screen.blit(spell_image, position)
 
         pygame.display.flip()
         dt = clock.tick(60) / 1000

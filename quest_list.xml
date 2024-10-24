@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quest_list>
+    <quest>
+        <spell name="sun_strike">
+            <quas>0</quas>
+            <wex>0</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="chaos_meteor">
+            <quas>0</quas>
+            <wex>1</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="alacrity">
+            <quas>0</quas>
+            <wex>2</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="EMP">
+            <quas>0</quas>
+            <wex>3</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="forge_spirit">
+            <quas>1</quas>
+            <wex>0</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="deafening_blast">
+            <quas>1</quas>
+            <wex>1</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="tornado">
+            <quas>1</quas>
+            <wex>2</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="ice_wall">
+            <quas>2</quas>
+            <wex>0</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="ghost_walk">
+            <quas>2</quas>
+            <wex>1</wex>
+        </spell>
+    </quest>
+    <quest>
+        <spell name="cold_snap">
+            <quas>3</quas>
+            <wex>0</wex>
+        </spell>
+    </quest>
+    <quest description="tornado + EMP">
+        <spell name="tornado">
+            <quas>1</quas>
+            <wex>2</wex>
+        </spell>
+        <spell name="EMP">
+            <quas>0</quas>
+            <wex>3</wex>
+        </spell>
+    </quest>
+</quest_list>
