@@ -6,6 +6,34 @@ from collections import deque
 import pygame
 
 
+class MagusMetrics:
+    def __init__(self, start_time: int):
+        self._start_time = start_time
+        self._elapsed_time = 0
+        self._used_spells = 0
+        self._pressed_keys = 0
+        self._spm = 0.0
+        self._kps = 0.0
+
+    def update(self, time: int):
+        self._elapsed_time = time - self._start_time
+        # Spells used per minute
+        self._spm = float(self._used_spells) / self._elapsed_time * 1000 * 60
+        # Pressed keys per used spell -- 5 in average
+        if self._used_spells != 0:
+            self._kps = float(self._pressed_keys) / self._used_spells
+
+    def incre_spells(self):
+        self._used_spells += 1
+
+    def incre_keys(self):
+        self._pressed_keys += 1
+
+    @property
+    def metrics(self):
+        return self._spm, self._kps
+
+
 def invoke(elementq: deque) -> tuple[int, int]:
     quas = 0
     wex = 0
@@ -19,12 +47,19 @@ def invoke(elementq: deque) -> tuple[int, int]:
     return quas, wex
 
 
+def xml2spell(spell: ET.Element):
+    return int(spell[0].text), int(spell[1].text)
+
+
 def fill_questq(questq: deque, questq_min_len: int, quest_list: list[ET.Element]):
     while len(questq) < questq_min_len:
         quest = random.choice(quest_list)
+        # Avoid two consecutive spells being the same.
+        while len(questq) > 0 and (xml2spell(quest[0]) == questq[-1]):
+            quest = random.choice(quest_list)
 
         for spell in quest:
-            questq.append((int(spell[0].text), int(spell[1].text)))
+            questq.append(xml2spell(spell))
 
 
 def main():
@@ -77,12 +112,21 @@ def main():
     slot1_rect = spell_slot1.get_rect()
     slot1_rect.center = (length / 2 + 64, width / 2 - 64 - 32)
 
+    eval = None
+    game_key_set = {pygame.K_q, pygame.K_w, pygame.K_e, pygame.K_r, pygame.K_d, pygame.K_f}
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
             if event.type == pygame.KEYDOWN:
+                if eval is None:
+                    eval = MagusMetrics(pygame.time.get_ticks())
+
+                if event.key in game_key_set:
+                    eval.incre_keys()
+
                 if event.key == pygame.K_q:
                     elementq.append("q")
                 elif event.key == pygame.K_w:
@@ -92,19 +136,20 @@ def main():
                 elif event.key == pygame.K_r:
                     if len(elementq) == 3:
                         spell = invoke(elementq)
-
                         if len(spellq) == 0 or spellq[-1] != spell:
                             spellq.append(spell)
                 elif event.key == pygame.K_d:
                     if len(spellq) > 0:
                         used_spell = spellq[-1]
                         if used_spell == questq[0]:
+                            eval.incre_spells()
                             questq.popleft()
                             fill_questq(questq, questq_min_len, quest_list)
                 elif event.key == pygame.K_f:
                     if len(spellq) > 1:
                         used_spell = spellq[0]
                         if used_spell == questq[0]:
+                            eval.incre_spells()
                             questq.popleft()
                             fill_questq(questq, questq_min_len, quest_list)
 
@@ -140,6 +185,25 @@ def main():
 
             spell_image = spell_tensor[j][k]
             screen.blit(spell_image, position)
+
+            if i == 3:
+                break
+
+        if eval is None:
+            pass
+        else:
+            eval.update(pygame.time.get_ticks())
+
+            metrics = eval.metrics
+            metric0 = font.render(f"Spells Per Minute: {metrics[0]:.2f}", True, (255, 255, 255))
+            metric0_rect = metric0.get_rect()
+            metric0_rect.topleft = (0, 0)
+            metric1 = font.render(f"Keys Per Spell: {metrics[1]:.2f}", True, (255, 255, 255))
+            metric1_rect = metric1.get_rect()
+            metric1_rect.topleft = (0, 32)
+
+            screen.blit(metric0, metric0_rect)
+            screen.blit(metric1, metric1_rect)
 
         pygame.display.flip()
         dt = clock.tick(60) / 1000

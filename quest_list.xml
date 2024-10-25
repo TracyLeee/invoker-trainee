@@ -70,4 +70,28 @@
             <wex>3</wex>
         </spell>
     </quest>
+    <quest description="tornado + meteor + blast">
+        <spell name="tornado">
+            <quas>1</quas>
+            <wex>2</wex>
+        </spell>
+        <spell name="chaos_meteor">
+            <quas>0</quas>
+            <wex>1</wex>
+        </spell>
+        <spell name="deafening_blast">
+            <quas>1</quas>
+            <wex>1</wex>
+        </spell>
+    </quest>
+    <quest description="tornado + wall">
+        <spell name="tornado">
+            <quas>1</quas>
+            <wex>2</wex>
+        </spell>
+        <spell name="ice_wall">
+            <quas>2</quas>
+            <wex>0</wex>
+        </spell>
+    </quest>
 </quest_list>
